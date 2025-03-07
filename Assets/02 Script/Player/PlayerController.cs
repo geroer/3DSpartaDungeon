@@ -11,6 +11,15 @@ public class PlayerController : MonoBehaviour
     private Vector2 curMovementInput;
     public LayerMask groundLayerMask;
 
+    [Header("Look")]
+    public Transform cameraContainer;
+    public float minXLook;
+    public float maxXLook;
+    private float camCurXRot;
+    public float lookSensitivity;
+    private Vector2 mouseDelta;
+    public bool canLook = true;
+
     private Rigidbody _rigidbody;
 
     private void Awake()
@@ -20,12 +29,20 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void FixedUpdate()
     {
         Move();
+    }
+
+    private void LateUpdate()
+    {
+        if (canLook)
+        {
+            CameraLook();
+        }
     }
 
     void Move()
@@ -88,5 +105,19 @@ public class PlayerController : MonoBehaviour
         }
 
         return false;
+    }
+
+    void CameraLook()
+    {
+        camCurXRot += mouseDelta.y * lookSensitivity;
+        camCurXRot = Mathf.Clamp(camCurXRot, minXLook, maxXLook);
+        cameraContainer.localEulerAngles = new Vector3(-camCurXRot, 0, 0);
+
+        transform.eulerAngles += new Vector3(0, mouseDelta.x * lookSensitivity, 0);
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        mouseDelta = context.ReadValue<Vector2>();
     }
 }
