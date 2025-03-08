@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +11,9 @@ public class PlayerController : MonoBehaviour
     public float jumpPower;
     private Vector2 curMovementInput;
     public LayerMask groundLayerMask;
+    public float runStamina;
+    public float jumpStamina;
+    private bool isRun = false;
 
     [Header("Look")]
     public Transform cameraContainer;
@@ -52,6 +56,17 @@ public class PlayerController : MonoBehaviour
         dir.y = _rigidbody.velocity.y;
 
         _rigidbody.velocity = dir;
+
+        if (isRun)
+        {
+            CharacterManager.Instance.Player.condition.UseStamina(runStamina);
+
+            if (CharacterManager.Instance.Player.condition.uiCondition.stamina.curValue <= 0)
+            {
+                addSpeed = 0;
+                isRun = false;
+            }
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -68,21 +83,32 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (CharacterManager.Instance.Player.condition.uiCondition.stamina.curValue <= 0) return;
+
         if (context.phase == InputActionPhase.Started && IsGrounded())
         {
             _rigidbody.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
+            CharacterManager.Instance.Player.condition.UseStamina(jumpStamina);
         }
     }
 
     public void OnRun(InputAction.CallbackContext context)
     {
+        if (CharacterManager.Instance.Player.condition.uiCondition.stamina.curValue <= 0)
+        {
+            addSpeed = 0;
+            isRun = false;
+        }
+
         if (context.phase == InputActionPhase.Performed)
         {
             addSpeed = runSpeed;
+            isRun = true;
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
             addSpeed = 0;
+            isRun = false;
         }
     }
 
@@ -96,7 +122,7 @@ public class PlayerController : MonoBehaviour
             new Ray(transform.position + (-transform.right * 0.2f) + (transform.up * 0.01f), Vector3.down)
         };
 
-        for(int i = 0; i < ray.Length; i++)
+        for (int i = 0; i < ray.Length; i++)
         {
             if (Physics.Raycast(ray[i], 0.1f, groundLayerMask))
             {
