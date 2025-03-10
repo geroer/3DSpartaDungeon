@@ -1,4 +1,5 @@
-using TMPro;
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,7 +25,10 @@ public class PlayerController : MonoBehaviour
     private Vector2 mouseDelta;
     public bool canLook = true;
 
+    public Action inventory;
     private Rigidbody _rigidbody;
+    private bool isSpeedBoosted = false;
+    public float boostDuration;
 
     private void Awake()
     {
@@ -145,5 +149,38 @@ public class PlayerController : MonoBehaviour
     public void OnLook(InputAction.CallbackContext context)
     {
         mouseDelta = context.ReadValue<Vector2>();
+    }
+
+    public void BoostSpeed(float amount)
+    {
+        if (!isSpeedBoosted)
+        {
+            StartCoroutine(SpeedBoostCoroutine(amount, boostDuration));
+        }
+    }
+
+    IEnumerator SpeedBoostCoroutine(float amount, float duration)
+    {
+        isSpeedBoosted = true;
+        moveSpeed += amount;
+        yield return new WaitForSeconds(duration);
+        moveSpeed -= amount;
+        isSpeedBoosted = false;
+    }
+
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+        if(context.phase == InputActionPhase.Started)
+        {
+            inventory?.Invoke();
+            ToggleCursor();
+        }
+    }
+
+    void ToggleCursor()
+    {
+        bool toggle = Cursor.lockState == CursorLockMode.Locked;
+        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
+        canLook = !toggle;
     }
 }
