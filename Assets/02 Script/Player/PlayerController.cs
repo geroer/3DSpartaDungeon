@@ -24,20 +24,39 @@ public class PlayerController : MonoBehaviour
     public float lookSensitivity;
     private Vector2 mouseDelta;
     public bool canLook = true;
+    public float minZoom;
+    public float maxZoom;
+    public float minZoomY;
+    public float maxZoomY;
+    public float minZoomX;
+    public float maxZoomX;
+    public float zoomSpeed;
+    private float currentZoom = 0f;
 
     public Action inventory;
     private Rigidbody _rigidbody;
     private bool isSpeedBoosted = false;
     public float boostDuration;
+    private Interaction interaction;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        interaction = GetComponent<Interaction>();
     }
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    private void Update()
+    {
+        Vector3 newCameraPos = cameraContainer.localPosition;
+        newCameraPos.z = -currentZoom;
+        newCameraPos.y = Mathf.Lerp(minZoomY, maxZoomY, (currentZoom - minZoom) / (maxZoom - minZoom));
+        newCameraPos.x = Mathf.Lerp(minZoomX, maxZoomX, (currentZoom - minZoom) / (maxZoom - minZoom));
+        cameraContainer.localPosition = Vector3.Lerp(cameraContainer.localPosition, newCameraPos, Time.deltaTime * zoomSpeed);
     }
 
     private void FixedUpdate()
@@ -182,5 +201,23 @@ public class PlayerController : MonoBehaviour
         bool toggle = Cursor.lockState == CursorLockMode.Locked;
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
+    }
+
+    public void OnCameraZoom(InputAction.CallbackContext context)
+    {
+        float scroolInput = context.ReadValue<float>();
+
+        if (scroolInput > 0 )
+        {
+            currentZoom--;
+            interaction.maxCheckDistance--;
+        }
+        else if (scroolInput < 0)
+        {
+            currentZoom++;
+            interaction.maxCheckDistance++;
+        }
+
+        currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
     }
 }
