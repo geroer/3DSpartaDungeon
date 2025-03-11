@@ -5704,7 +5704,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2406925541289663507, guid: b513d3f040b763a4aaba156f59b52ed2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.72
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2406925541289663507, guid: b513d3f040b763a4aaba156f59b52ed2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5742,9 +5742,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3579254232785349936, guid: b513d3f040b763a4aaba156f59b52ed2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10
+      objectReference: {fileID: 0}
     - target: {fileID: 4054727534860276353, guid: b513d3f040b763a4aaba156f59b52ed2, type: 3}
       propertyPath: m_Name
       value: JumpPad
+      objectReference: {fileID: 0}
+    - target: {fileID: 5803904106696767812, guid: b513d3f040b763a4aaba156f59b52ed2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
